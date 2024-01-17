@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Information</title>
+</head>
+<body>
+    <h2>Employee Information Form</h2>
+    <form id="employeeForm">
+        <label for="empid">Employee ID:</label>
+        <input type="text" id="empid" name="empid" required><br>
+
+        <label for="empname">Employee Name:</label>
+        <input type="text" id="empname" name="empname" required><br>
+
+        <label for="empsal">Employee Salary:</label>
+        <input type="text" id="empsal" name="empsal" required><br>
+
+        <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+
+    <script>
+        function submitForm() {
+            const empid = document.getElementById("empid").value;
+            const empname = document.getElementById("empname").value;
+            const empsal = document.getElementById("empsal").value;
+
+            const formData = {
+                empid: empid,
+                empname: empname,
+                empsal: empsal
+            };
+
+            // Assuming Flask API endpoint is at http://localhost:5000/save_employee
+            const apiUrl = "http://localhost:5000/save_employee";
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // Handle success (if needed)
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                // Handle error (if needed)
+            });
+        }
+    </script>
+</body>
+</html>
