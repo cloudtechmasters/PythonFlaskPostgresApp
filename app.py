@@ -13,32 +13,52 @@ def frontend():
 mysqlCursor = mysqlConnection.cursor()
 
 
+from flask import Flask, render_template, request, jsonify
+import mysql.connector
+
+app = Flask(__name__)
+mysqlConnection = mysql.connector.connect(host="localhost", user="root", password="new_password", database="testdb", port=3306)
+
+
+@app.route('/')
+def frontend():
+    return render_template('frontend.html')
+
+
+mysqlCursor = mysqlConnection.cursor()
+
+
 @app.route('/save_employee', methods=['POST'])
 def save_employee():
-    data = request.get_json()
-    tupleFromDict = tuple(data.values())
-    print(f"tupleFromDict:{tupleFromDict}")
-    empid = request.form.get('empid')
-    empname = request.form.get('empname')
-    empsal = request.form.get('empsal')
-    sql = "INSERT INTO employee (empid, empname,empsal) VALUES (%s, %s,%s)"
-    mysqlCursor.execute(sql, tupleFromDict)
+    try:
+        data = request.get_json()
+        print(f"JSON Data: {data}")
 
-    mysqlConnection.commit()
+        empid = data.get('empid')
+        empname = data.get('empname')
+        empsal = data.get('empsal')
 
-    print(mysqlCursor.rowcount, "record inserted.")
-    # Process and save employee data (modify this part based on your needs)
+        # Validate and process the data as needed
 
-    response = {
-        'message': 'Employee information saved successfully',
-        'empid': empid,
-        'empname': empname,
-        'empsal': empsal
-    }
+        # Assuming you have a MySQL connection and cursor defined earlier
+        sql = "INSERT INTO employees (empid, empname, empsal) VALUES (%s, %s, %s)"
+        mysqlCursor.execute(sql, (empid, empname, empsal))
+        mysqlConnection.commit()
 
-    return jsonify(response)
+        print(mysqlCursor.rowcount, "record inserted.")
 
+        response = {
+            'message': 'Employee information saved successfully',
+            'empid': empid,
+            'empname': empname,
+            'empsal': empsal
+        }
+
+        return jsonify(response), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    # Run Flask app on a remote host and port
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)
+
